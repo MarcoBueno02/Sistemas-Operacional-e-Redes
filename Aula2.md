@@ -100,7 +100,67 @@ Confirma o isolamento pretendido: dono e grupo `devs` com acesso total, e nenhum
 ```
 Observação: o arquivo foi criado com o grupo `administrador` (grupo primário de quem o criou), e não `devs` — ver detalhes na seção 6.
 
-**Pendente:** os testes de alternância de sessão (`su - fulano` validando acesso permitido, e `su - novato` validando acesso negado) e o exercício de fixação com o grupo `financeiro` ainda não foram executados nesta prática — a documentação será complementada assim que forem realizados.
+**Teste A — `fulano` (grupo `devs`), após correção do grupo do arquivo:**
+```bash
+su - fulano
+cd /srv/projeto
+echo "Revisado por Fulano" >> config_redes.txt
+cat config_redes.txt
+```
+Saída:
+```
+Especificacao tecnica do roteador de borda
+Revisado por Fulano
+```
+Acesso de escrita concedido corretamente, confirmando que `fulano` pertence ao grupo `devs`.
+
+**Teste B — `novato` (fora do grupo `devs`):**
+```bash
+su - novato
+cd /srv/projeto
+ls -l /srv/projeto
+```
+Resultado: acesso negado, conforme esperado — `novato` não pertence ao grupo `devs` e a pasta não concede permissão a "outros".
+
+**Exercício de fixação — grupo `financeiro`:**
+```bash
+sudo groupadd financeiro
+sudo usermod -aG financeiro cicrano
+sudo usermod -aG financeiro beltrano
+sudo mkdir -p /srv/financeiro
+sudo chown administrador /srv/financeiro
+sudo chgrp financeiro /srv/financeiro
+sudo chmod 770 /srv/financeiro
+ls -ld /srv/financeiro
+```
+Saída:
+```
+drwxrwx--- 2 administrador financeiro 4096 Aug 26 22:06 /srv/financeiro
+```
+
+Teste com `cicrano` (deve conseguir criar arquivo — pertence ao grupo `financeiro`):
+```bash
+su - cicrano
+echo "Relatorio Q3" > /srv/financeiro/relatorio.txt
+cat /srv/financeiro/relatorio.txt
+```
+Saída: `Relatorio Q3` — sucesso.
+
+Teste com `fulano` (não deve conseguir — pertence ao `devs`, não ao `financeiro`):
+```bash
+su - fulano
+cd /srv/financeiro
+```
+Saída: `-bash: cd: /srv/financeiro: Permission denied` — acesso corretamente negado.
+
+Teste com `novato` (não deve conseguir — não pertence a nenhum dos dois grupos):
+```bash
+su - novato
+cd /srv/financeiro
+```
+Saída: `-bash: cd: /srv/financeiro: Permission denied` — acesso corretamente negado.
+
+Todos os resultados confirmam o isolamento de acesso pretendido: cada grupo (`devs` e `financeiro`) tem acesso exclusivo ao seu próprio diretório, e usuários fora do grupo (incluindo `novato`, sem nenhuma associação) são bloqueados em ambos.
 
 ## 6. Problemas e Soluções
 
@@ -110,10 +170,12 @@ Observação: o arquivo foi criado com o grupo `administrador` (grupo primário 
 
 - **`novato` associado incorretamente ao grupo `devs`:** por engano, `sudo usermod -aG devs novato` foi executado, incluindo o usuário `novato` no grupo `devs` — o que compromete o objetivo do exercício, já que `novato` deveria representar o perfil externo (sem acesso) nos testes de permissão. **Solução:** remover a associação com `sudo gpasswd -d novato devs` antes de prosseguir com os testes de `su -`.
 
-- **Grupo do arquivo `config_redes.txt` diferente do esperado:** ao criar o arquivo com `echo ... > /srv/projeto/config_redes.txt`, o grupo associado ficou como `administrador` em vez de `devs`. Isso ocorre porque, sem o bit SGID ativado no diretório pai, arquivos novos herdam o grupo primário de quem os cria, não o grupo do diretório. Para que arquivos futuros herdem automaticamente o grupo `devs`, seria necessário `sudo chmod g+s /srv/projeto`; para corrigir o arquivo já existente, `sudo chgrp devs /srv/projeto/config_redes.txt`.
+- **Grupo do arquivo `config_redes.txt` diferente do esperado:** ao criar o arquivo com `echo ... > /srv/projeto/config_redes.txt`, o grupo associado ficou como `administrador` em vez de `devs`. Isso ocorre porque, sem o bit SGID ativado no diretório pai, arquivos novos herdam o grupo primário de quem os cria, não o grupo do diretório. Consequência prática: o usuário `fulano`, mesmo pertencendo ao grupo `devs` e tendo acesso de escrita no diretório, recebeu `Permission denied` ao tentar editar o arquivo diretamente, pois o grupo do arquivo ainda era `administrador`. **Solução:** `sudo chgrp devs /srv/projeto/config_redes.txt`, que corrigiu o problema e permitiu a escrita no Teste A. Para que arquivos futuros herdem automaticamente o grupo `devs` sem precisar repetir esse ajuste, seria possível ativar o bit SGID no diretório com `sudo chmod g+s /srv/projeto`.
+
+- **Comando `usermod` sem `sudo`:** ao tentar corrigir a associação do `cicrano` ao grupo `devs`, o comando `usermod -aG devs cicrano` foi executado sem o prefixo `sudo`, resultando em `Permission denied` e `usermod: cannot lock /etc/passwd; try again later`. **Solução:** repetir o comando com `sudo usermod -aG devs cicrano`, que funcionou normalmente.
 
 ## 7. Conclusão
-*[PREENCHER após concluir os testes de `su -` e o exercício de fixação com o grupo `financeiro` — a conclusão deve refletir o aprendizado completo da prática, incluindo os erros da seção 6.]*
+Esta prática consolidou, na prática, os conceitos de administração de usuários, grupos e permissões no Linux. A criação de contas com `adduser`, a organização em grupos de trabalho com `groupadd`/`usermod -aG`, e o controle de acesso via `chown`, `chgrp` e `chmod` em notação octal (770 para diretórios, 660 para arquivos) mostraram-se ferramentas fundamentais para isolar recursos entre diferentes equipes em um mesmo servidor. Os erros encontrados ao longo do processo — o esquecimento na criação de um usuário, uma associação incorreta a um grupo, um comando executado sem privilégios elevados e a diferença entre a permissão de um diretório e a de um arquivo dentro dele — reforçaram, na prática, um ponto central da administração Linux: permissões de diretório e de arquivo são independentes, e o comportamento de herança de grupo depende do bit SGID, não sendo automático por padrão. O exercício de fixação com o grupo `financeiro` validou que o mesmo modelo de permissões escala corretamente para múltiplos grupos isolados em um mesmo sistema, com cada equipe tendo acesso exclusivo ao seu próprio diretório de trabalho.
 
 <img src="imagens/WhatsApp Image 2026-08-26 at 17.58.17.jpeg">
 <img src="imagens/WhatsApp Image 2026-08-26 at 17.59.35.jpeg">
@@ -123,3 +185,7 @@ Observação: o arquivo foi criado com o grupo `administrador` (grupo primário 
 <img src="imagens/WhatsApp Image 2026-08-26 at 18.05.24.jpeg">
 <img src="imagens/WhatsApp Image 2026-08-26 at 18.07.35.jpeg">
 <img src="imagens/WhatsApp Image 2026-08-26 at 18.09.08.jpeg">
+<img src="imagens/WhatsApp Image 2026-08-26 at 19.10.33.jpeg">
+<img src="imagens/WhatsApp Image 2026-08-26 at 19.09.53.jpeg">
+<img src="imagens/WhatsApp Image 2026-08-26 at 19.08.39.jpeg">
+<img src="imagens/WhatsApp Image 2026-08-26 at 19.00.53.jpeg">
