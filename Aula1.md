@@ -61,3 +61,5 @@ Não foram enfrentados erros críticos durante a execução da prática; o proce
 ## 7. Conclusão
 
 Esta prática permitiu consolidar, de forma aplicada, os conceitos fundamentais de virtualização utilizando o Oracle VirtualBox como hypervisor tipo 2. A instalação do Ubuntu Server evidenciou a importância do particionamento LVM para flexibilidade futura no gerenciamento de armazenamento, bem como a relevância da criação correta de um usuário administrador com privilégios `sudo` para a segurança e operação do sistema. A validação por meio dos comandos `ip addr`, `df -h` e `apt-get update` demonstrou, na prática, como verificar a integridade de rede, armazenamento e conectividade de um servidor recém-instalado — habilidades essenciais para a administração de ambientes Linux, sejam eles virtuais ou físicos.
+
+<img src="imagens/58620384-b4f2-456a-ae50-5a87d524366f.png">
