@@ -1,6 +1,6 @@
 # Sistemas Operacional e Redes
 
-Repositório pessoal de documentação das atividades da disciplina **Laboratório de Sistemas Operacionais e Redes (LSOR)** — Bacharelado em Sistemas de Informação, IFAL Campus Maceió.
+Segue meu repositório pessoal de documentação das atividades da disciplina **Laboratório de Sistemas Operacionais e Redes (LSOR)** — Bacharelado em Sistemas de Informação, IFAL Campus Maceió.
 
 - **Aluno:** Marco André da Costa Bueno Padilha
 - **Professor:** Alaelson Jatobá
