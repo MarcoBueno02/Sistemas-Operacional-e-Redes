@@ -4,7 +4,7 @@
 - **Nome completo:** Marco André da Costa Bueno Padilha
 - **Curso:** Sistemas de Informação
 - **Turma:** BSI 2026.02
-- **Data:** [PREENCHER — data em que executou a prática]
+- **Data:** 30/09
 - **Título da prática:** Acesso Remoto SSH via Redirecionamento de Portas no VirtualBox e Diagnóstico de Rede
 
 ## 2. Objetivo
