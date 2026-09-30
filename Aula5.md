@@ -126,3 +126,5 @@ TCP    192.168.100.151:56201  57.144.165.32:5222     ESTABLISHED
 
 ## 7. Conclusão
 [PREENCHER — refletir sobre a importância de entender o fluxo de portas em redes virtualizadas (NAT), a diferença entre uma sessão local (tty1) e uma sessão remota (pts/0), e a utilidade prática dos comandos de auditoria (`route -n`, `netstat`, `w`, `traceroute`) para diagnosticar conectividade e monitorar acessos remotos em um servidor.]
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/b90308e6-4767-4876-86a8-52bc3f302a6a" />
