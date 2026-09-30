@@ -4,7 +4,7 @@
 - **Nome completo:** Marco André da Costa Bueno Padilha
 - **Curso:** Sistemas de Informação
 - **Turma:** BSI 2026.02
-- **Data:** 30/09
+- **Data:** 30/09/2026
 - **Título da prática:** Acesso Remoto SSH via Redirecionamento de Portas no VirtualBox e Diagnóstico de Rede
 
 ## 2. Objetivo
@@ -59,25 +59,50 @@ exit
 
 **`ifconfig` (VM):**
 ```
-[PREENCHER — colar a saída completa, destacando inet 10.0.2.15 e o MAC address]
+enp0s3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.0.2.15  netmask 255.255.255.0  broadcast 10.0.2.255
+        inet6 fe80::a00:27ff:fe39:9ca9  prefixlen 64  scopeid 0x20<link>
+        inet6 fd17:625c:f037:2:a00:27ff:fe39:9ca9  prefixlen 64  scopeid 0x0<global>
+        ether 08:00:27:39:9c:a9  txqueuelen 1000  (Ethernet)
+        RX packets 3824  bytes 5183478 (5.1 MB)
+        TX packets 2279  bytes 173109 (173.1 KB)
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
 ```
+A interface `enp0s3` confirma o IP padrão do modo NAT (`10.0.2.15/24`) e o MAC address `08:00:27:39:9c:a9`.
 
 **`route -n` (VM):**
 ```
-[PREENCHER — colar a saída, destacando a linha do gateway padrão 10.0.2.2]
+Kernel IP routing table
+Destination     Gateway       Genmask         Flags Metric Ref  Use Iface
+0.0.0.0         10.0.2.2      0.0.0.0         UG    100    0     0  enp0s3
+10.0.2.0        0.0.0.0       255.255.255.0   U     100    0     0  enp0s3
+10.0.2.2        0.0.0.0       255.255.255.255 UH    100    0     0  enp0s3
+192.168.100.199 10.0.2.2      255.255.255.255 UGH   100    0     0  enp0s3
 ```
+A rota padrão (`0.0.0.0`) aponta para `10.0.2.2`, que é o gateway virtual do modo NAT do VirtualBox.
 
 **`traceroute 8.8.8.8` (VM):**
 ```
-[PREENCHER — colar os saltos exibidos]
+traceroute to 8.8.8.8 (8.8.8.8), 30 hops max, 60 byte packets
+ 1  _gateway (10.0.2.2)  0.561 ms  0.882 ms  0.898 ms
+ 2  _gateway (10.0.2.2)  2.131 ms  1.974 ms  2.176 ms
 ```
+O traçado mostra apenas o gateway NAT (`10.0.2.2`) respondendo nos dois primeiros saltos, evidenciando que o VirtualBox faz NAT/mascaramento de todo o tráfego de saída da VM antes de chegar à internet real — os saltos seguintes até `8.8.8.8` não retornam resposta ICMP visível dentro do ambiente virtualizado.
 
 **`netstat -an | findstr 5222` no Windows, ANTES do redirecionamento:**
 ```
-[PREENCHER — deve vir vazio, sem nenhuma linha retornada]
+TCP    192.168.100.151:56201  57.144.165.32:5222     ESTABLISHED
 ```
+*(Ver seção 6 — essa linha não tem relação com a VM; é uma coincidência de outro processo do Windows usando a porta 5222.)*
 
-**Regra de redirecionamento criada no VirtualBox:** [PREENCHER — print da tabela com a regra SSH]
+**Regra de redirecionamento criada no VirtualBox:**
+
+| Nome | Protocolo | Endereço IP do Hospedeiro | Porta do Hospedeiro | IP Convidado | Porta Convidado |
+|---|---|---|---|---|---|
+| SSH | TCP | 127.0.0.1 | 5222 | 10.0.2.15 | 22 |
 
 **`netstat -an | findstr 5222` no Windows, DEPOIS da regra ativa:**
 ```
