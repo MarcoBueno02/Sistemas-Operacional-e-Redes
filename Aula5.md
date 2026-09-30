@@ -157,3 +157,13 @@ Confirma as duas sessões simultâneas: `tty1` (console local da VM, sem origem,
 
 ## 7. Conclusão
 Esta prática consolidou o entendimento sobre como o VirtualBox implementa o acesso a serviços de uma VM em modo NAT através do Redirecionamento de Portas, já que por padrão o modo NAT isola a VM da rede do Host, tornando necessário mapear explicitamente uma porta do Hospedeiro (`127.0.0.1:5222`) para a porta de destino no Convidado (`10.0.2.15:22`). Os diagnósticos com `ifconfig` e `route -n` reforçaram como a VM enxerga sua própria rede interna (gateway `10.0.2.2`), enquanto o `traceroute` evidenciou que todo o tráfego de saída passa por esse gateway virtual antes de qualquer roteamento externo. O uso do `netstat` nos dois lados da conexão (Windows e Linux) mostrou, na prática, os três estados de uma porta TCP — inexistente, `LISTENING` e `ESTABLISHED` — permitindo acompanhar o ciclo de vida completo da conexão SSH. Por fim, o comando `w` demonstrou de forma clara a diferença entre uma sessão local (`tty1`) e uma sessão remota (`pts/0`), habilidade fundamental para qualquer administrador auditar quem está acessando um servidor e de onde. Os próprios erros cometidos — confundir uma porta coincidente em uso por outro processo, tentar um comando exclusivo do Windows dentro do Linux, e rodar um comando na janela errada — reforçaram, na prática, a importância de prestar atenção em qual terminal e qual sistema operacional cada comando deve ser executado.
+
+<img width="1107" height="768" alt="image" src="https://github.com/user-attachments/assets/9cd0e161-55ae-4de3-9792-318f83a9997d" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/9ab0cc63-dea0-4398-828e-2ddb868db0ff" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/c0ad912d-8482-4b5f-89d6-455bf310d046" />
+<img width="1115" height="628" alt="image" src="https://github.com/user-attachments/assets/58684946-bdd5-45a4-88eb-f124270586e8" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/48cd148d-1696-4476-b482-92a56b12bd9a" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/9aa8540c-b00c-42ab-b6f4-4f5e46b575df" />
+<img width="1039" height="768" alt="image" src="https://github.com/user-attachments/assets/bbb0934a-9733-4de4-99b5-9a2dc9b785cd" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/cd30e711-810b-4884-b0fb-59b535b8ba22" />
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/0e0d4919-af21-4586-a72c-1e31f8c20d97" />
